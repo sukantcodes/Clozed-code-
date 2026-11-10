@@ -97,15 +97,13 @@ jobs:
             {
               echo "## :x: Build failed — \`$TASK\` (exit $STATUS)"
               echo ""
-              if grep -q "What went wrong:" "$LOG"; then
-                echo '```'
-                sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOG" | awk '/What went wrong:/{p=1} p; /\* Try:/{if(p) exit}'
-                echo '```'
-              fi
-              echo ""
-              echo "### First Kotlin/Gradle errors"
+              echo "### What went wrong (80 lines after the marker)"
               echo '```'
-              grep -E "^e: |error:|FAILURE:|Caused by:" "$LOG" | head -40 || true
+              sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$LOG" | awk '/What went wrong:/{p=1;n=0} p{print;n++} n>80{exit}'
+              echo '```'
+              echo "### Resource / Kotlin errors"
+              echo '```'
+              grep -nE "Android resource linking failed|ERROR:|^e: |error:|Caused by:|> " "$LOG" | head -60 || true
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
             exit "$STATUS"

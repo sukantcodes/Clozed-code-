@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.ClozedCode" parent="android:Theme.DeviceDefault.DayNight.NoActionBar" />
+    <!--
+      Compose draws the whole UI, so this theme only needs to be a no-action-bar
+      base with the right window colours. Framework styles are used to avoid a
+      dependency on Material Components.
+
+      NOTE: android:Theme.DeviceDefault.DayNight.NoActionBar does NOT exist in the
+      framework (DayNight and NoActionBar are never combined on DeviceDefault),
+      and referencing it fails resource linking. Use the plain NoActionBar parent
+      and let Compose handle dark/light.
+    -->
+    <style name="Theme.ClozedCode" parent="android:Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">#FF12131A</item>
+        <item name="android:statusBarColor">#FF12131A</item>
+        <item name="android:navigationBarColor">#FF12131A</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 </resources>
