@@ -3,6 +3,7 @@ package com.clozed.code.engine
 import android.content.Context
 import com.clozed.code.data.SessionInfo
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -56,7 +57,7 @@ class SessionStore(private val ctx: Context) {
             ?.let { runCatching { json.decodeFromString<Sess>(it.readText()) }.getOrNull() }
 
     fun save(s: Sess) {
-        runCatching { File(dir, "${s.id}.json").writeText(json.encodeToString<Sess>(s.copy(updated = System.currentTimeMillis()))) }
+        runCatching { File(dir, "${s.id}.json").writeText(json.encodeToString(s.copy(updated = System.currentTimeMillis()))) }
     }
 
     fun delete(id: String) { File(dir, "$id.json").delete() }

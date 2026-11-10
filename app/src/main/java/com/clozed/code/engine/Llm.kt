@@ -1,6 +1,8 @@
 package com.clozed.code.engine
 
 import com.clozed.code.data.ProviderDef
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -80,8 +82,10 @@ class LlmException(message: String, val code: Int = 0) : Exception(message) {
 /** Streams chat completions from Anthropic or any OpenAI-compatible provider. */
 class Llm {
 
-    suspend fun stream(req: LlmRequest, onDelta: (String) -> Unit): StepAcc =
+    /** Streams one model step. The blocking SSE read runs on [Dispatchers.IO] so the agent loop never touches the Android main thread. */
+    suspend fun stream(req: LlmRequest, onDelta: (String) -> Unit): StepAcc = withContext(Dispatchers.IO) {
         if (req.provider.kind == "anthropic") anthropic(req, onDelta) else openai(req, onDelta)
+    }
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 

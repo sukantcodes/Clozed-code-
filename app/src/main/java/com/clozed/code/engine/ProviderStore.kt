@@ -3,6 +3,7 @@ package com.clozed.code.engine
 import android.content.Context
 import com.clozed.code.data.ProviderDef
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
@@ -37,7 +38,7 @@ class ProviderStore(private val ctx: Context) {
             ?: emptyList()
 
     fun save(list: List<StoredProvider>) {
-        prefs.edit().putString("providers", json.encodeToString<List<StoredProvider>>(list)).apply()
+        prefs.edit().putString("providers", json.encodeToString(list)).apply()
     }
 
     fun selectedProvider(): String = prefs.getString("provider", "anthropic") ?: "anthropic"
@@ -76,7 +77,7 @@ class ProviderStore(private val ctx: Context) {
         }
     }
 
-    fun export(): String = json.encodeToString<ProviderBackup>(
+    fun export(): String = json.encodeToString(
         ProviderBackup(providers = load(), exportedAt = System.currentTimeMillis())
     )
 

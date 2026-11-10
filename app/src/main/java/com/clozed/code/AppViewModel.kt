@@ -385,7 +385,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         this.backend = backend
         viewModelScope.launch {
             try {
-                backend.run(prompt)
+                withContext(Dispatchers.IO) { backend.run(prompt) }
             } finally {
                 ui = ui.copy(running = false)
                 state = ""
