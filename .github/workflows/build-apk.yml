@@ -1,0 +1,91 @@
+name: Build Android APK
+run-name: ${{ inputs.taskName }} @ ${{ github.ref_name }}
+
+# Modelled on ni554n/apk-builder-action, but self-contained: it builds THIS
+# repository instead of cloning a remote one, which is what you want when the
+# app source already lives here. GitHub's ubuntu-latest image ships the Android
+# SDK, so no extra SDK download is needed.
+on:
+  workflow_dispatch:
+    inputs:
+      jdkVersion:
+        description: "OpenJDK version: 17 (required by this project)"
+        required: false
+        default: "17"
+      taskName:
+        description: "Gradle task: assembleDebug, assembleRelease, ..."
+        required: false
+        default: "assembleDebug"
+  push:
+    branches: ["main", "master"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ inputs.jdkVersion || '17' }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.11.1
+
+      - name: Point Gradle at the runner's Android SDK
+        run: |
+          if [ -z "$ANDROID_HOME" ]; then
+            echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
+          fi
+          echo "sdk.dir=${ANDROID_HOME:-$ANDROID_SDK_ROOT}" > local.properties
+
+      - name: Accept SDK licenses
+        run: yes | sdkmanager --licenses > /dev/null 2>&1 || true
+
+      - name: Generate the Gradle wrapper if it is missing
+        run: |
+          if [ ! -f gradlew ]; then
+            echo "gradlew missing, running 'gradle wrapper'"
+            gradle wrapper --gradle-version 8.11.1
+          fi
+          chmod +x gradlew
+
+      - name: Build
+        env:
+          TASK: ${{ inputs.taskName || 'assembleDebug' }}
+        run: |
+          SIGNING_ARGS=()
+          if [[ "$TASK" == *Release* ]]; then
+            mkdir -p "$HOME/.android"
+            if [ ! -f "$HOME/.android/debug.keystore" ]; then
+              keytool -genkey -v \
+                -keystore "$HOME/.android/debug.keystore" \
+                -storepass android -alias androiddebugkey -keypass android \
+                -keyalg RSA -keysize 2048 -validity 10000 \
+                -dname "C=US, O=Android, CN=Android Debug"
+            fi
+            SIGNING_ARGS=(
+              "-Pandroid.injected.signing.store.file=$HOME/.android/debug.keystore"
+              "-Pandroid.injected.signing.store.password=android"
+              "-Pandroid.injected.signing.key.alias=androiddebugkey"
+              "-Pandroid.injected.signing.key.password=android"
+            )
+          fi
+          ./gradlew "$TASK" "${SIGNING_ARGS[@]}" --stacktrace --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: clozed-code-apk
+          path: app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
+          retention-days: 7

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Clozed Code</string>
+    <string name="agent_running">Clozed Code is working</string>
+    <string name="agent_channel">Agent</string>
+</resources>
