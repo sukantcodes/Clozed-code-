@@ -41,8 +41,8 @@ import com.clozed.code.ui.theme.TextFaint
 /** Settings: providers & keys, agent, project, MCP, permissions, backup. */
 @Composable
 fun SettingsScreen(vm: AppViewModel) {
-    var modelPicker by remember { mutableStateOf<StoredProvider?>() }
-    var keyEditor by remember { mutableStateOf<StoredProvider?>() }
+    var modelPicker by remember { mutableStateOf<StoredProvider?>(null) }
+    var keyEditor by remember { mutableStateOf<StoredProvider?>(null) }
 
     LazyColumn(
         Modifier.fillMaxWidth().padding(12.dp),

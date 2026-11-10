@@ -56,7 +56,7 @@ class SessionStore(private val ctx: Context) {
             ?.let { runCatching { json.decodeFromString<Sess>(it.readText()) }.getOrNull() }
 
     fun save(s: Sess) {
-        runCatching { File(dir, "${s.id}.json").writeText(json.encodeToString(s.copy(updated = System.currentTimeMillis()))) }
+        runCatching { File(dir, "${s.id}.json").writeText(json.encodeToString<Sess>(s.copy(updated = System.currentTimeMillis()))) }
     }
 
     fun delete(id: String) { File(dir, "$id.json").delete() }

@@ -136,7 +136,7 @@ class McpManager(private val ctx: Context) {
             ?: emptyList()
 
     fun save(list: List<McpServer>) {
-        prefs.edit().putString("servers", json.encodeToString(list)).apply()
+        prefs.edit().putString("servers", json.encodeToString<List<McpServer>>(list)).apply()
     }
 
     fun add(server: McpServer) = save(servers().filterNot { it.id == server.id } + server)

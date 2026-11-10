@@ -115,4 +115,4 @@ data class Prefs(
 )
 
 @Serializable
-data class ApiException(val code: Int, val message: String) : Exception(message)
+data class ApiException(val code: Int, override val message: String) : Exception(message)

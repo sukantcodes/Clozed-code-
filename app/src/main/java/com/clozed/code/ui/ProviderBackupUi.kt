@@ -28,7 +28,7 @@ import com.clozed.code.ui.theme.WarnAmber
 @Composable
 fun ProviderBackupScreen(vm: AppViewModel) {
     var text by remember { mutableStateOf("") }
-    var message by remember { mutableStateOf<String?>() }
+    var message by remember { mutableStateOf<String?>(null) }
 
     Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("Providers & API keys", style = MaterialTheme.typography.titleLarge)

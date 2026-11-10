@@ -37,7 +37,7 @@ class ProviderStore(private val ctx: Context) {
             ?: emptyList()
 
     fun save(list: List<StoredProvider>) {
-        prefs.edit().putString("providers", json.encodeToString(list)).apply()
+        prefs.edit().putString("providers", json.encodeToString<List<StoredProvider>>(list)).apply()
     }
 
     fun selectedProvider(): String = prefs.getString("provider", "anthropic") ?: "anthropic"
@@ -76,7 +76,7 @@ class ProviderStore(private val ctx: Context) {
         }
     }
 
-    fun export(): String = json.encodeToString(
+    fun export(): String = json.encodeToString<ProviderBackup>(
         ProviderBackup(providers = load(), exportedAt = System.currentTimeMillis())
     )
 

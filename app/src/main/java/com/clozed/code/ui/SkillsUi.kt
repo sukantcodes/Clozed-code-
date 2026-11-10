@@ -30,7 +30,7 @@ import com.clozed.code.ui.theme.TextFaint
 /** Skills bundled in assets and discovered from the project. */
 @Composable
 fun SkillsScreen(vm: AppViewModel) {
-    var open by remember { mutableStateOf<Skills.Skill?>() }
+    var open by remember { mutableStateOf<Skills.Skill?>(null) }
     Column(Modifier.fillMaxWidth().padding(12.dp)) {
         Text("Skills", style = MaterialTheme.typography.titleLarge)
         if (vm.skills.isEmpty()) {
